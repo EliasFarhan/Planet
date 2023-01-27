@@ -1,0 +1,10 @@
+{
+  "name": "planets",
+  "version-string": "1.0",
+  "dependencies": [
+    "sfml",
+    "benchmark",
+    "gtest",
+    "fmt"
+  ]
+}
