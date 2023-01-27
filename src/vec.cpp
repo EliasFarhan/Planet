@@ -22,6 +22,17 @@ FourFloat FourFloat::Sqrt() const
 }
 
 template<>
+FourFloat FourFloat::ReciprocalSqrt() const
+{
+    auto vs = _mm_loadu_ps(data());
+    vs = _mm_rsqrt_ps(vs);
+
+    FourFloat result;
+    _mm_storeu_ps(&result[0], vs);
+    return result;
+}
+
+template<>
 FourFloat FourFloat::operator*(const FloatArray<4>& rhs) const
 {
     auto v1s = _mm_loadu_ps(data());

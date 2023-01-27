@@ -110,6 +110,17 @@ TEST(FourFloat, Sqrt)
     }
 }
 
+TEST(FourFloat, RSqrt)
+{
+    constexpr std::array<float, 4> numbers = {1.0f, 3.4f, 5.1f, 9.1f};
+    constexpr auto four_f = planets::FourFloat (numbers.data());
+    const auto result = four_f.ReciprocalSqrt();
+    for(int i = 0; i < 4; i++)
+    {
+        EXPECT_LE(result[i]-1.0f/std::sqrt(numbers[i]), 0.001f); //Approximation of rsqrt
+    }
+}
+
 TEST(FourVec2f, Constructor)
 {
     constexpr std::array<planets::Vec2f, 4> vs{{

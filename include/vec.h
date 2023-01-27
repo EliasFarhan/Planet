@@ -136,7 +136,7 @@ public:
         }
         return result;
     }
-    FloatArray<N> Sqrt() const
+    [[nodiscard]] FloatArray<N> Sqrt() const
     {
         FloatArray<N> result;
         for(int i = 0; i < N; i++)
@@ -145,7 +145,7 @@ public:
         }
         return result;
     }
-    FloatArray<N> ReciprocalSqrt() const
+    [[nodiscard]] FloatArray<N> ReciprocalSqrt() const
     {
         FloatArray<N> result;
         for(int i = 0; i < N; i++)
@@ -224,13 +224,13 @@ public:
         }
         return result;
     }
-    FloatArray<N> SquareMagnitude() const
+    [[nodiscard]] FloatArray<N> SquareMagnitude() const
     {
         return Dot(*this, *this);
     }
 
-    const auto& Xs() const {return xs_;}
-    const auto& Ys() const {return ys_;}
+    [[nodiscard]] const auto& Xs() const {return xs_;}
+    [[nodiscard]] const auto& Ys() const {return ys_;}
 
 private:
     std::array<float, N> xs_{};
@@ -241,10 +241,12 @@ using FourVec2f = NVec2f<4>;
 
 #ifdef USE_INTRINSICS
 
-
 #if defined(__SSE__)
     template<>
     FourFloat FourFloat::Sqrt() const;
+
+    template<>
+    FourFloat FourFloat::ReciprocalSqrt() const;
 
     template<>
     FourFloat FourFloat::operator*(const FloatArray<4>& rhs) const;
