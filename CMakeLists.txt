@@ -30,3 +30,8 @@ find_package(GTest CONFIG REQUIRED)
 add_executable(test test/test_vec.cpp src/vec.cpp)
 target_link_libraries(test PRIVATE GTest::gtest GTest::gtest_main)
 target_include_directories(test PRIVATE include/)
+
+find_package(benchmark CONFIG REQUIRED)
+add_executable(bench_planet bench/bench_planet.cpp src/planet.cpp src/vec.cpp)
+target_include_directories(bench_planet PRIVATE include/)
+target_link_libraries(bench_planet PRIVATE benchmark::benchmark benchmark::benchmark_main)
