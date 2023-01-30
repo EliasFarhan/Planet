@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <array>
+#include <random>
 
 #define USE_INTRINSICS
 
@@ -29,6 +30,7 @@ struct Vec2f
         y+= other.y;
         return *this;
     }
+    constexpr  Vec2f operator-() const { return { -x, -y }; }
     constexpr Vec2f operator-(Vec2f other) const { return {x-other.x, y-other.y}; }
     constexpr Vec2f& operator-=(Vec2f other)
     {
@@ -38,6 +40,17 @@ struct Vec2f
     }
     constexpr Vec2f operator*(float f) const {return {x*f, y*f};}
     constexpr Vec2f operator/(float f) const{return {x/f, y/f};}
+    [[nodiscard]] Vec2f Rotate(float angle) const
+    {
+        const float sin = std::sin(angle);
+        const float cos = std::cos(angle);
+        return { (cos * x) - (sin * y) , (sin * x) + (cos * y) };
+    }
+
+    [[nodiscard]] constexpr Vec2f Perpendicular() const
+    {
+        return { y, -x };
+    }
 
     constexpr static float Dot(Vec2f v1, Vec2f v2)
     {
@@ -88,6 +101,13 @@ class FloatArray
 {
 public:
     FloatArray() = default;
+    constexpr FloatArray(float f)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            ns_[i] = f;
+        }
+    }
     constexpr FloatArray(const float* ptr)
     {
         for(int i = 0; i < 4; i++)
@@ -184,12 +204,31 @@ class NVec2f
 {
 public:
     NVec2f() = default;
-    constexpr NVec2f(const Vec2f* ptr)
+
+    constexpr explicit NVec2f(const Vec2f& v)
+    {
+        for (int i = 0; i < N; i++)
+        {
+            xs_[i] = v.x;
+            ys_[i] = v.y;
+        }
+    }
+
+    constexpr explicit NVec2f(const Vec2f* ptr)
     {
         for(int i = 0; i < N; i++)
         {
             xs_[i] = ptr[i].x;
             ys_[i] = ptr[i].y;
+        }
+    }
+
+    constexpr explicit NVec2f(const std::array<Vec2f, N> array)
+    {
+        for (int i = 0; i < N; i++)
+        {
+            xs_[i] = array[i].x;
+            ys_[i] = array[i].y;
         }
     }
 
@@ -203,6 +242,17 @@ public:
         }
         return result;
     }
+
+    NVec2f<N>& operator+=(const NVec2f<N>& other)
+    {
+        for (int i = 0; i < N; i++)
+        {
+            xs_[i] += other.xs_[i];
+            ys_[i] += other.ys_[i];
+        }
+        return *this;
+    }
+
     NVec2f<N> operator-(const NVec2f<N>& other) const
     {
         NVec2f<N> result;

@@ -15,11 +15,18 @@
 constexpr unsigned int width = 1280;
 constexpr unsigned int height = 720;
 constexpr auto planetCount = 1024;
+constexpr float zoomFactor = 1.5f;
 
 int main()
 {
-    planets::PlanetSystem planetSystem(planetCount);
+    planets::PlanetSystem4 planetSystem(planetCount);
     std::vector<sf::CircleShape> circles(planetCount);
+    for(auto& circle: circles)
+    {
+        circle.setRadius(3.0f);
+        circle.setFillColor(sf::Color::Blue);
+        circle.setOrigin(3.0f, 3.0f);
+    }
 
     sf::RenderWindow window(sf::VideoMode(width, height), "Planets");
     //window.setFramerateLimit(5);
@@ -38,13 +45,18 @@ int main()
                 view = sf::View({ 0,0 }, { static_cast<float>(event.size.width), static_cast<float>(event.size.height) });
                 window.setView(view);
             }
+            if (event.type == sf::Event::MouseWheelScrolled)
+            {
+                view.zoom((1.0f - zoomFactor * event.mouseWheelScroll.delta * dt.asSeconds()));
+                window.setView(view);
+            }
         }
 
         planetSystem.Update(dt.asSeconds());
         auto planets = planetSystem.GetPlanets();
         for(int i = 0; i < planetCount; i++)
         {
-            circles[i].setPosition(static_cast<sf::Vector2f>(planets[i].position));
+            circles[i].setPosition(static_cast<sf::Vector2f>(planets[i].position*planets::pixelToMeter));
         }
 
         window.clear();

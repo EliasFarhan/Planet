@@ -11,12 +11,29 @@ namespace planets
 constexpr float innerRadius = 1.5f;
 constexpr float outerRaidus = 5.5f;
 constexpr float pixelToMeter = 100.f;
+constexpr float G = 100.0f;
+constexpr Vec2f worldCenter{ 5.0f, 5.0f };
+//Shoudl not be equal to worldCenter
+constexpr Vec2f defaultPos{ 1.0f, 1.0f };
+constexpr Vec2f defaultVel{ 100.0f, 100.0f };
 
 struct Planet
 {
     Vec2f position{};
     Vec2f velocity{};
 };
+
+constexpr float CalculateAcceleration(float radius)
+{
+    return G / (radius * radius);
+}
+
+inline FourFloat CalculateAcceleration(FourFloat radius)
+{
+    const FourFloat g{ G };
+    return g / (radius * radius);
+}
+
 class PlanetSystem
 {
 public:
