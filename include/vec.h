@@ -1,6 +1,7 @@
 #pragma once
 
 #include "intrinsics.h"
+#include <SFML/System/Vector2.hpp>
 
 #include <cmath>
 #include <array>
@@ -43,6 +44,11 @@ struct Vec2f
         return v1.x*v2.x+v1.y*v2.y;
     }
 
+    constexpr static float Det(Vec2f v1, Vec2f v2)
+    {
+        return v1.x * v2.y - v1.y * v2.x;
+    }
+
     [[nodiscard]] constexpr float SquareMagnitude() const
     {
         return Dot(*this, *this);
@@ -57,7 +63,20 @@ struct Vec2f
     {
         return *this/Magnitude();
     }
+
+    static float AngleBetween(Vec2f v1, Vec2f v2)
+    {
+        const auto dot = Dot(v1, v2);
+        const auto det = Det(v1, v2);
+        return  std::atan2(det, dot);
+    }
+
+    explicit operator sf::Vector2f() const
+    {
+        return { x, y };
+    }
 };
+
 
 constexpr Vec2f operator*(float f, Vec2f v)
 {
@@ -79,8 +98,8 @@ public:
     const float& operator[](int i) const { return ns_[i]; }
     float& operator[](int i){ return ns_[i]; }
 
-    const float* data() const{return &ns_[0];}
-    float* data(){return &ns_[0];}
+    [[nodiscard]] const float* data() const{ return ns_.data(); }
+    float* data(){ return ns_.data(); }
 
     FloatArray<N> operator+(const FloatArray<N>& other) const
     {
@@ -224,9 +243,30 @@ public:
         }
         return result;
     }
+
+    static FloatArray<N> Det(const NVec2f<N>& v1, const NVec2f<N>& v2)
+    {
+        FloatArray<N> result;
+        for (int i = 0; i < N; i++)
+        {
+            result[i] = v1.xs_[i] * v2.ys_[i] - v1.ys_[i] * v2.xs_[i];
+        }
+        return result;
+    }
+
     [[nodiscard]] FloatArray<N> SquareMagnitude() const
     {
         return Dot(*this, *this);
+    }
+
+    [[nodiscard]] FloatArray<N> Magnitude() const
+    {
+        return SquareMagnitude().Sqrt();
+    }
+
+    [[nodiscard]] NVec2f<N> Normalized() const
+    {
+        return (*this) * SquareMagnitude().ReciprocalSqrt();
     }
 
     [[nodiscard]] const auto& Xs() const {return xs_;}
@@ -254,11 +294,18 @@ using FourVec2f = NVec2f<4>;
     template<>
     FourFloat FourFloat::operator*(float rhs) const;
 
+    //FourVec2f
     template<>
     FourVec2f FourVec2f::operator+(const NVec2f<4>& other) const;
 
     template<>
     FourVec2f FourVec2f::operator-(const NVec2f<4>& other) const;
+
+    template<>
+    FourVec2f FourVec2f::operator*(const FloatArray<4>& ns) const;
+
+    template<>
+    FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const;
 
     template<>
     FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2);

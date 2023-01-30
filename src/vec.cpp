@@ -17,7 +17,7 @@ FourFloat FourFloat::Sqrt() const
     vs = _mm_sqrt_ps(vs);
 
     FourFloat result;
-    _mm_storeu_ps(&result[0], vs);
+    _mm_storeu_ps(result.data(), vs);
     return result;
 }
 
@@ -28,7 +28,7 @@ FourFloat FourFloat::ReciprocalSqrt() const
     vs = _mm_rsqrt_ps(vs);
 
     FourFloat result;
-    _mm_storeu_ps(&result[0], vs);
+    _mm_storeu_ps(result.data(), vs);
     return result;
 }
 
@@ -93,8 +93,41 @@ FourVec2f FourVec2f::operator-(const FourVec2f& v) const
 }
 
 template<>
+FourVec2f FourVec2f::operator*(const FloatArray<4>& ns) const
+{
+    FourVec2f fv3f;
+    auto x1 = _mm_loadu_ps(xs_.data());
+    auto y1 = _mm_loadu_ps(ys_.data());
+
+    const auto x2 = _mm_loadu_ps(ns.data());
+    x1 = _mm_mul_ps(x1, x2);
+    y1 = _mm_mul_ps(y1, x2);
+
+    _mm_storeu_ps(fv3f.xs_.data(), x1);
+    _mm_storeu_ps(fv3f.ys_.data(), y1);
+    return fv3f;
+}
+
+template<>
+FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const
+{
+    FourVec2f fv3f;
+    auto x1 = _mm_loadu_ps(xs_.data());
+    auto y1 = _mm_loadu_ps(ys_.data());
+
+    const auto x2 = _mm_loadu_ps(ns.data());
+    x1 = _mm_div_ps(x1, x2);
+    y1 = _mm_div_ps(y1, x2);
+
+    _mm_storeu_ps(fv3f.xs_.data(), x1);
+    _mm_storeu_ps(fv3f.ys_.data(), y1);
+    return fv3f;
+}
+
+template<>
 FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2)
 {
+    FourFloat result;
     auto x1 = _mm_loadu_ps(v1.Xs().data());
     auto y1 = _mm_loadu_ps(v1.Ys().data());
 
@@ -106,8 +139,7 @@ FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2)
 
     x1 = _mm_add_ps(x1, y1);
 
-    FourFloat result;
-    _mm_storeu_ps(&result[0], x1);
+    _mm_storeu_ps(result.data(), x1);
     return result;
 }
 #endif

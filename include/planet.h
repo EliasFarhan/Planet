@@ -8,6 +8,10 @@
 namespace planets
 {
 
+constexpr float innerRadius = 1.5f;
+constexpr float outerRaidus = 5.5f;
+constexpr float pixelToMeter = 100.f;
+
 struct Planet
 {
     Vec2f position{};
@@ -22,6 +26,8 @@ public:
 private:
     std::vector<Planet> planets_;
 };
+
+
 
 class PlanetSystem4
 {
