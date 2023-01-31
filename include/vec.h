@@ -30,7 +30,7 @@ struct Vec2f
         y+= other.y;
         return *this;
     }
-    constexpr  Vec2f operator-() const { return { -x, -y }; }
+    constexpr Vec2f operator-() const { return { -x, -y }; }
     constexpr Vec2f operator-(Vec2f other) const { return {x-other.x, y-other.y}; }
     constexpr Vec2f& operator-=(Vec2f other)
     {
@@ -101,16 +101,16 @@ class FloatArray
 {
 public:
     FloatArray() = default;
-    constexpr FloatArray(float f)
+    explicit FloatArray(float f)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < N; i++)
         {
             ns_[i] = f;
         }
     }
-    constexpr FloatArray(const float* ptr)
+    explicit FloatArray(const float* ptr)
     {
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < N; i++)
         {
             ns_[i] = ptr[i];
         }
@@ -198,6 +198,7 @@ private:
 };
 
 using FourFloat = FloatArray<4>;
+using EightFloat = FloatArray<8>;
 
 template<int N>
 class NVec2f
@@ -328,10 +329,17 @@ private:
 };
 
 using FourVec2f = NVec2f<4>;
+using EightVec2f = NVec2f<8>;
 
 #ifdef USE_INTRINSICS
 
 #if defined(__SSE__)
+    template<>
+    FourFloat::FloatArray(float f);
+
+    template<>
+    FourFloat::FloatArray(const float* f);
+
     template<>
     FourFloat FourFloat::Sqrt() const;
 
@@ -359,6 +367,43 @@ using FourVec2f = NVec2f<4>;
 
     template<>
     FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2);
+#endif
+
+#ifdef __AVX2__
+
+template<>
+EightFloat::FloatArray(float f);
+
+template<>
+EightFloat::FloatArray(const float* f);
+
+template<>
+EightFloat EightFloat::Sqrt() const;
+
+template<>
+EightFloat EightFloat::ReciprocalSqrt() const;
+
+template<>
+EightFloat EightFloat::operator*(const EightFloat& rhs) const;
+
+template<>
+EightFloat EightFloat::operator*(float rhs) const;
+
+//EightVec2f
+template<>
+EightVec2f EightVec2f::operator+(const EightVec2f& other) const;
+
+template<>
+EightVec2f EightVec2f::operator-(const EightVec2f& other) const;
+
+template<>
+EightVec2f EightVec2f::operator*(const EightFloat& ns) const;
+
+template<>
+EightVec2f EightVec2f::operator/(const EightFloat& ns) const;
+
+template<>
+EightFloat EightVec2f::Dot(const EightVec2f &v1, const EightVec2f &v2);
 #endif
 
 #endif

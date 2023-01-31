@@ -19,7 +19,7 @@ constexpr float zoomFactor = 1.5f;
 
 int main()
 {
-    planets::PlanetSystem4 planetSystem(planetCount);
+    planets::PlanetSystem8 planetSystem(planetCount);
     std::vector<sf::CircleShape> circles(planetCount);
     for(auto& circle: circles)
     {

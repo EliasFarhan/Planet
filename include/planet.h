@@ -12,7 +12,7 @@ constexpr float innerRadius = 1.5f;
 constexpr float outerRaidus = 5.5f;
 constexpr float pixelToMeter = 100.f;
 constexpr float G = 100.0f;
-constexpr Vec2f worldCenter{ 5.0f, 5.0f };
+constexpr Vec2f worldCenter{ 5.0f, 2.5f };
 //Shoudl not be equal to worldCenter
 constexpr Vec2f defaultPos{ 1.0f, 1.0f };
 constexpr Vec2f defaultVel{ 100.0f, 100.0f };
@@ -28,9 +28,15 @@ constexpr float CalculateAcceleration(float radius)
     return G / (radius * radius);
 }
 
-inline FourFloat CalculateAcceleration(FourFloat radius)
+inline FourFloat CalculateAcceleration(const FourFloat& radius)
 {
     const FourFloat g{ G };
+    return g / (radius * radius);
+}
+
+inline EightFloat CalculateAcceleration(const EightFloat& radius)
+{
+    const EightFloat g{ G };
     return g / (radius * radius);
 }
 
@@ -58,4 +64,15 @@ private:
     std::vector<FourVec2f> velocities_;
 };
 
+class PlanetSystem8
+{
+public:
+    PlanetSystem8(std::size_t planetCount);
+    void Update(float dt);
+    std::span<Planet> GetPlanets() { return planets_;}
+private:
+    std::vector<Planet> planets_;
+    std::vector<EightVec2f> positions_;
+    std::vector<EightVec2f> velocities_;
+};
 }

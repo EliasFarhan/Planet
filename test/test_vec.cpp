@@ -102,7 +102,7 @@ TEST(Vec2f, Magnitude)
 TEST(FourFloat, Sqrt)
 {
     constexpr std::array<float, 4> numbers = {1.0f, 3.4f, 5.1f, 9.1f};
-    constexpr auto four_f = planets::FourFloat (numbers.data());
+    const auto four_f = planets::FourFloat (numbers.data());
     const auto result = four_f.Sqrt();
     for(int i = 0; i < 4; i++)
     {
@@ -113,7 +113,7 @@ TEST(FourFloat, Sqrt)
 TEST(FourFloat, RSqrt)
 {
     constexpr std::array<float, 4> numbers = {1.0f, 3.4f, 5.1f, 9.1f};
-    constexpr auto four_f = planets::FourFloat (numbers.data());
+    const auto four_f = planets::FourFloat (numbers.data());
     const auto result = four_f.ReciprocalSqrt();
     for(int i = 0; i < 4; i++)
     {
@@ -211,7 +211,7 @@ TEST(FourVec2f, MulFloat)
                                                         8.0f,
                                                 }
     };
-    constexpr auto four_ns = planets::FourFloat (ns.data());
+    const auto four_ns = planets::FourFloat (ns.data());
 
     const auto result = four_vs*four_ns;
     for(int i = 0; i < 4; i++)
@@ -239,7 +239,7 @@ TEST(FourVec2f, DivFloat)
                                               8.0f,
                                       }
     };
-    constexpr auto four_ns = planets::FourFloat(ns.data());
+    const auto four_ns = planets::FourFloat(ns.data());
 
     const auto result = four_vs/four_ns;
     for(int i = 0; i < 4; i++)
