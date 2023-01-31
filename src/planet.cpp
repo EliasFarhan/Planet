@@ -8,7 +8,7 @@ namespace planets
 
 constexpr auto pi = std::numbers::pi_v<float>;
 
-PlanetSystem::PlanetSystem(std::size_t planetCount)
+PlanetSystem::PlanetSystem(std::size_t planetCount) noexcept
 {
     planets_.reserve(planetCount);
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
@@ -32,7 +32,7 @@ PlanetSystem::PlanetSystem(std::size_t planetCount)
     }
 }
 
-void PlanetSystem::Update(float dt)
+void PlanetSystem::Update(float dt) noexcept
 {
     for (auto& planet : planets_)
     {
@@ -46,26 +46,28 @@ void PlanetSystem::Update(float dt)
     }
 }
 
-PlanetSystem4::PlanetSystem4(std::size_t planetCount)
+PlanetSystem4::PlanetSystem4(std::size_t planetCount) noexcept
 {
     planets_.reserve(planetCount);
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
     std::uniform_real_distribution<float> disRadius(innerRadius, outerRaidus);
     std::uniform_real_distribution<float> disAngle(0, pi);
-
+    std::vector<Vec2f> velocities;
+    velocities.reserve(planetCount);
     for (std::size_t i = 0; i < planetCount; i++)
     {
         const auto radius = disRadius(gen);
         const auto angle = disAngle(gen);
 
-        Planet planet;
+        PlanetPos planet;
 
         const auto v = Vec2f::up().Rotate(angle) * radius;
 
         planet.position = v + worldCenter;
-        planet.velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
+        Vec2f velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
         planets_.push_back(planet);
+        velocities.push_back(velocity);
 
     }
     positions_.resize(planetCount / 4 + 1);
@@ -82,16 +84,16 @@ PlanetSystem4::PlanetSystem4(std::size_t planetCount)
         positions_[i] = FourVec2f{ posTmp };
         const std::array<Vec2f, 4> velTmp = {
     {
-        i * 4 < planetCount ? planets_[i * 4].velocity : defaultVel,
-        i * 4 + 1 < planetCount ? planets_[i * 4 + 1].velocity : defaultVel,
-        i * 4 + 2 < planetCount ? planets_[i * 4 + 2].velocity : defaultVel,
-        i * 4 + 3 < planetCount ? planets_[i * 4 + 3].velocity : defaultVel
+        i * 4 < planetCount ? velocities[i * 4] : defaultVel,
+        i * 4 + 1 < planetCount ? velocities[i * 4 + 1] : defaultVel,
+        i * 4 + 2 < planetCount ? velocities[i * 4 + 2] : defaultVel,
+        i * 4 + 3 < planetCount ? velocities[i * 4 + 3] : defaultVel
     } };
         velocities_[i] = FourVec2f{ velTmp };
     }
 }
 
-void PlanetSystem4::Update(float dt)
+void PlanetSystem4::Update(float dt) noexcept
 {
     for (std::size_t i = 0; i < velocities_.size(); i++)
     {
@@ -112,7 +114,7 @@ void PlanetSystem4::Update(float dt)
     }
 }
 
-PlanetSystem8::PlanetSystem8(std::size_t planetCount)
+PlanetSystem8::PlanetSystem8(std::size_t planetCount) noexcept
 {
     planets_.reserve(planetCount);
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
@@ -120,19 +122,23 @@ PlanetSystem8::PlanetSystem8(std::size_t planetCount)
     std::uniform_real_distribution<float> disRadius(innerRadius, outerRaidus);
     std::uniform_real_distribution<float> disAngle(0, pi);
 
+    std::vector<Vec2f> velocities;
+    velocities.reserve(planetCount);
+
     for (std::size_t i = 0; i < planetCount; i++)
     {
         const auto radius = disRadius(gen);
         const auto angle = disAngle(gen);
 
-        Planet planet;
+        PlanetPos planet;
+        
 
         const auto v = Vec2f::up().Rotate(angle) * radius;
 
         planet.position = v + worldCenter;
-        planet.velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
+        Vec2f velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
         planets_.push_back(planet);
-
+        velocities.push_back(velocity);
     }
     positions_.resize(planetCount / 8 + 1);
     velocities_.resize(planetCount / 8 + 1);
@@ -152,20 +158,20 @@ PlanetSystem8::PlanetSystem8(std::size_t planetCount)
         positions_[i] = EightVec2f{ posTmp };
         const std::array<Vec2f, 8> velTmp = {
                 {
-                        i * 8 < planetCount ? planets_[i * 8].velocity : defaultVel,
-                        i * 8 + 1 < planetCount ? planets_[i * 8 + 1].velocity : defaultVel,
-                        i * 8 + 2 < planetCount ? planets_[i * 8 + 2].velocity : defaultVel,
-                        i * 8 + 3 < planetCount ? planets_[i * 8 + 3].velocity : defaultVel,
-                        i * 8 + 4 < planetCount ? planets_[i * 8 + 4].velocity : defaultVel,
-                        i * 8 + 5 < planetCount ? planets_[i * 8 + 5].velocity : defaultVel,
-                        i * 8 + 6 < planetCount ? planets_[i * 8 + 6].velocity : defaultVel,
-                        i * 8 + 7 < planetCount ? planets_[i * 8 + 7].velocity : defaultVel,
+                        i * 8 < planetCount ? velocities[i * 8] : defaultVel,
+                        i * 8 + 1 < planetCount ? velocities[i * 8 + 1] : defaultVel,
+                        i * 8 + 2 < planetCount ? velocities[i * 8 + 2] : defaultVel,
+                        i * 8 + 3 < planetCount ? velocities[i * 8 + 3] : defaultVel,
+                        i * 8 + 4 < planetCount ? velocities[i * 8 + 4] : defaultVel,
+                        i * 8 + 5 < planetCount ? velocities[i * 8 + 5] : defaultVel,
+                        i * 8 + 6 < planetCount ? velocities[i * 8 + 6] : defaultVel,
+                        i * 8 + 7 < planetCount ? velocities[i * 8 + 7] : defaultVel,
                 } };
         velocities_[i] = EightVec2f{ velTmp };
     }
 }
 
-void PlanetSystem8::Update(float dt)
+void PlanetSystem8::Update(float dt) noexcept
 {
     for (std::size_t i = 0; i < velocities_.size(); i++)
     {

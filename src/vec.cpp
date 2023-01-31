@@ -6,27 +6,27 @@
 
 namespace planets
 {
-#ifdef USE_INTRINSICS
+#if false
 
 
 #if defined(__SSE__)
 
 template<>
-FourFloat::FloatArray(float f)
+FourFloat::FloatArray(float f) noexcept
 {
     auto v2 = _mm_load1_ps(&f);
     _mm_storeu_ps(data(), v2);
 }
 
 template<>
-FourFloat::FloatArray(const float* f)
+FourFloat::FloatArray(const float* f) noexcept
 {
     auto v2 = _mm_loadu_ps(f);
     _mm_storeu_ps(data(), v2);
 }
 
 template<>
-FourFloat FourFloat::Sqrt() const
+FourFloat FourFloat::Sqrt() const noexcept
 {
     auto vs = _mm_loadu_ps(data());
     vs = _mm_sqrt_ps(vs);
@@ -37,7 +37,7 @@ FourFloat FourFloat::Sqrt() const
 }
 
 template<>
-FourFloat FourFloat::ReciprocalSqrt() const
+FourFloat FourFloat::ReciprocalSqrt() const noexcept
 {
     auto vs = _mm_loadu_ps(data());
     vs = _mm_rsqrt_ps(vs);
@@ -48,7 +48,7 @@ FourFloat FourFloat::ReciprocalSqrt() const
 }
 
 template<>
-FourFloat FourFloat::operator*(const FloatArray<4>& rhs) const
+FourFloat FourFloat::operator*(const FloatArray<4>& rhs) const noexcept
 {
     auto v1s = _mm_loadu_ps(data());
     auto v2s = _mm_loadu_ps(rhs.data());
@@ -60,7 +60,7 @@ FourFloat FourFloat::operator*(const FloatArray<4>& rhs) const
 }
 
 template<>
-FourFloat FourFloat::operator*(float rhs) const
+FourFloat FourFloat::operator*(float rhs) const noexcept
 {
     auto v1s = _mm_loadu_ps(data());
     auto v2 = _mm_load1_ps(&rhs);
@@ -72,7 +72,7 @@ FourFloat FourFloat::operator*(float rhs) const
 }
 
 template<>
-FourVec2f FourVec2f::operator+(const FourVec2f& v) const
+FourVec2f FourVec2f::operator+(const FourVec2f& v) const noexcept
 {
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());
@@ -90,7 +90,7 @@ FourVec2f FourVec2f::operator+(const FourVec2f& v) const
 }
 
 template<>
-FourVec2f FourVec2f::operator-(const FourVec2f& v) const
+FourVec2f FourVec2f::operator-(const FourVec2f& v) const noexcept
 {
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());
@@ -108,7 +108,7 @@ FourVec2f FourVec2f::operator-(const FourVec2f& v) const
 }
 
 template<>
-FourVec2f FourVec2f::operator*(const FourFloat& ns) const
+FourVec2f FourVec2f::operator*(const FourFloat& ns) const noexcept
 {
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());
@@ -124,7 +124,7 @@ FourVec2f FourVec2f::operator*(const FourFloat& ns) const
 }
 
 template<>
-FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const
+FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const noexcept
 {
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());
@@ -140,7 +140,7 @@ FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const
 }
 
 template<>
-FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2)
+FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2) noexcept
 {
     FourFloat result;
     auto x1 = _mm_loadu_ps(v1.Xs().data());
@@ -163,21 +163,21 @@ FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2)
 #ifdef __AVX2__
 
 template<>
-EightFloat::FloatArray(float f)
+EightFloat::FloatArray(float f) noexcept
 {
     auto reg = _mm256_broadcast_ss(&f);
-    _mm256_store_ps(data(), reg);
+    _mm256_storeu_ps(data(), reg);
 }
 
 template<>
-EightFloat::FloatArray(const float* f)
+EightFloat::FloatArray(const float* f) noexcept
 {
     auto reg = _mm256_load_ps(f);
-    _mm256_store_ps(data(), reg);
+    _mm256_storeu_ps(data(), reg);
 }
 
 template<>
-EightFloat EightFloat::Sqrt() const
+EightFloat EightFloat::Sqrt() const noexcept
 {
     auto vs = _mm256_loadu_ps(data());
     vs = _mm256_sqrt_ps(vs);
@@ -188,7 +188,7 @@ EightFloat EightFloat::Sqrt() const
 }
 
 template<>
-EightFloat EightFloat::ReciprocalSqrt() const
+EightFloat EightFloat::ReciprocalSqrt() const noexcept
 {
     auto vs = _mm256_loadu_ps(data());
     vs = _mm256_rsqrt_ps(vs);
@@ -199,7 +199,7 @@ EightFloat EightFloat::ReciprocalSqrt() const
 }
 
 template<>
-EightFloat EightFloat::operator*(const EightFloat& rhs) const
+EightFloat EightFloat::operator*(const EightFloat& rhs) const noexcept
 {
     auto v1s = _mm256_loadu_ps(data());
     auto v2s = _mm256_loadu_ps(rhs.data());
@@ -211,7 +211,7 @@ EightFloat EightFloat::operator*(const EightFloat& rhs) const
 }
 
 template<>
-EightFloat EightFloat::operator*(float rhs) const
+EightFloat EightFloat::operator*(float rhs) const noexcept
 {
     auto v1s = _mm256_loadu_ps(data());
     auto v2s = _mm256_broadcast_ss(&rhs);
@@ -224,7 +224,7 @@ EightFloat EightFloat::operator*(float rhs) const
 
 //EightVec2f
 template<>
-EightVec2f EightVec2f::operator+(const EightVec2f& other) const
+EightVec2f EightVec2f::operator+(const EightVec2f& other) const noexcept
 {
     EightVec2f fv3f;
     auto x1 = _mm256_loadu_ps(xs_.data());
@@ -242,7 +242,7 @@ EightVec2f EightVec2f::operator+(const EightVec2f& other) const
 }
 
 template<>
-EightVec2f EightVec2f::operator-(const EightVec2f& other) const
+EightVec2f EightVec2f::operator-(const EightVec2f& other) const noexcept
 {
     EightVec2f fv3f;
     auto x1 = _mm256_loadu_ps(xs_.data());
@@ -260,7 +260,7 @@ EightVec2f EightVec2f::operator-(const EightVec2f& other) const
 }
 
 template<>
-EightVec2f EightVec2f::operator*(const EightFloat& ns) const
+EightVec2f EightVec2f::operator*(const EightFloat& ns) const noexcept
 {
     EightVec2f fv3f;
     auto x1 = _mm256_loadu_ps(xs_.data());
@@ -276,7 +276,7 @@ EightVec2f EightVec2f::operator*(const EightFloat& ns) const
 }
 
 template<>
-EightVec2f EightVec2f::operator/(const EightFloat& ns) const
+EightVec2f EightVec2f::operator/(const EightFloat& ns) const noexcept
 {
     EightVec2f fv3f;
     auto x1 = _mm256_loadu_ps(xs_.data());
@@ -292,7 +292,7 @@ EightVec2f EightVec2f::operator/(const EightFloat& ns) const
 }
 
 template<>
-EightFloat EightVec2f::Dot(const EightVec2f &v1, const EightVec2f &v2)
+EightFloat EightVec2f::Dot(const EightVec2f &v1, const EightVec2f &v2) noexcept
 {
     EightFloat result;
     auto x1 = _mm256_loadu_ps(v1.Xs().data());

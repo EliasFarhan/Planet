@@ -23,43 +23,48 @@ struct Planet
     Vec2f velocity{};
 };
 
-constexpr float CalculateAcceleration(float radius)
+constexpr float CalculateAcceleration(float radius) noexcept
 {
     return G / (radius * radius);
 }
 
-inline FourFloat CalculateAcceleration(const FourFloat& radius)
+inline FourFloat CalculateAcceleration(const FourFloat& radius) noexcept
 {
     const FourFloat g{ G };
     return g / (radius * radius);
 }
 
-inline EightFloat CalculateAcceleration(const EightFloat& radius)
+inline EightFloat CalculateAcceleration(const EightFloat& radius) noexcept
 {
     const EightFloat g{ G };
     return g / (radius * radius);
 }
 
+
+
 class PlanetSystem
 {
 public:
-    PlanetSystem(std::size_t planetCount);
-    void Update(float dt);
-    std::span<Planet> GetPlanets() { return planets_;}
+    PlanetSystem(std::size_t planetCount) noexcept;
+    void Update(float dt) noexcept;
+    std::span<Planet> GetPlanets() noexcept { return planets_;}
 private:
     std::vector<Planet> planets_;
 };
 
-
+struct PlanetPos
+{
+    Vec2f position{};
+};
 
 class PlanetSystem4
 {
 public:
-    PlanetSystem4(std::size_t planetCount);
-    void Update(float dt);
-    std::span<Planet> GetPlanets() { return planets_;}
+    PlanetSystem4(std::size_t planetCount) noexcept;
+    void Update(float dt) noexcept;
+    std::span<PlanetPos> GetPlanets() noexcept { return planets_;}
 private:
-    std::vector<Planet> planets_;
+    std::vector<PlanetPos> planets_;
     std::vector<FourVec2f> positions_;
     std::vector<FourVec2f> velocities_;
 };
@@ -67,11 +72,11 @@ private:
 class PlanetSystem8
 {
 public:
-    PlanetSystem8(std::size_t planetCount);
-    void Update(float dt);
-    std::span<Planet> GetPlanets() { return planets_;}
+    PlanetSystem8(std::size_t planetCount) noexcept;
+    void Update(float dt) noexcept;
+    std::span<PlanetPos> GetPlanets()  noexcept { return planets_;}
 private:
-    std::vector<Planet> planets_;
+    std::vector<PlanetPos> planets_;
     std::vector<EightVec2f> positions_;
     std::vector<EightVec2f> velocities_;
 };
