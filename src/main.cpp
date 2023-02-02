@@ -19,7 +19,7 @@ constexpr float zoomFactor = 1.5f;
 
 int main()
 {
-    planets::PlanetSystem8 planetSystem(planetCount);
+    planets::PlanetSystem planetSystem(planetCount);
     std::vector<sf::CircleShape> circles(planetCount);
     for(auto& circle: circles)
     {
@@ -56,6 +56,7 @@ int main()
         auto planets = planetSystem.GetPlanets();
         for(int i = 0; i < planetCount; i++)
         {
+            const auto position = planetSystem.GetPosition(i);
             circles[i].setPosition(static_cast<sf::Vector2f>(planets[i].position*planets::pixelToMeter));
         }
 

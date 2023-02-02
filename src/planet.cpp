@@ -46,28 +46,31 @@ void PlanetSystem::Update(float dt) noexcept
     }
 }
 
+Vec2f PlanetSystem::GetPosition(int index) const
+{
+    return planets_[index].position;
+}
+
 PlanetSystem4::PlanetSystem4(std::size_t planetCount) noexcept
 {
-    planets_.reserve(planetCount);
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
     std::uniform_real_distribution<float> disRadius(innerRadius, outerRaidus);
     std::uniform_real_distribution<float> disAngle(0, pi);
-    std::vector<Vec2f> velocities;
-    velocities.reserve(planetCount);
+    std::vector<Planet> planets;
+    planets.reserve(planetCount);
     for (std::size_t i = 0; i < planetCount; i++)
     {
         const auto radius = disRadius(gen);
         const auto angle = disAngle(gen);
 
-        PlanetPos planet;
+        Planet planet;
 
         const auto v = Vec2f::up().Rotate(angle) * radius;
 
         planet.position = v + worldCenter;
-        Vec2f velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
-        planets_.push_back(planet);
-        velocities.push_back(velocity);
+        planet.velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
+        planets.push_back(planet);
 
     }
     positions_.resize(planetCount / 4 + 1);
@@ -76,18 +79,18 @@ PlanetSystem4::PlanetSystem4(std::size_t planetCount) noexcept
     {
         const std::array<Vec2f, 4> posTmp = {
             {
-                i*4<planetCount?planets_[i * 4].position:defaultPos,
-                i*4+1<planetCount?planets_[i * 4 + 1].position : defaultPos,
-                i*4+2<planetCount?planets_[i * 4 + 2].position : defaultPos,
-                i*4+3<planetCount?planets_[i * 4 + 3].position : defaultPos
+                i*4<planetCount?planets[i * 4].position:defaultPos,
+                i*4+1<planetCount?planets[i * 4 + 1].position : defaultPos,
+                i*4+2<planetCount?planets[i * 4 + 2].position : defaultPos,
+                i*4+3<planetCount?planets[i * 4 + 3].position : defaultPos
             } };
         positions_[i] = FourVec2f{ posTmp };
         const std::array<Vec2f, 4> velTmp = {
     {
-        i * 4 < planetCount ? velocities[i * 4] : defaultVel,
-        i * 4 + 1 < planetCount ? velocities[i * 4 + 1] : defaultVel,
-        i * 4 + 2 < planetCount ? velocities[i * 4 + 2] : defaultVel,
-        i * 4 + 3 < planetCount ? velocities[i * 4 + 3] : defaultVel
+        i * 4 < planetCount ? planets[i * 4].velocity : defaultVel,
+        i * 4 + 1 < planetCount ? planets[i * 4 + 1].velocity : defaultVel,
+        i * 4 + 2 < planetCount ? planets[i * 4 + 2].velocity : defaultVel,
+        i * 4 + 3 < planetCount ? planets[i * 4 + 3].velocity : defaultVel
     } };
         velocities_[i] = FourVec2f{ velTmp };
     }
@@ -107,38 +110,36 @@ void PlanetSystem4::Update(float dt) noexcept
         //Calculate new position
         positions_ [i] += velocities_[i] * fourDt;
     }
+}
 
-    for(std::size_t i = 0; i < planets_.size(); i++)
-    {
-        planets_[i].position = { positions_[i / 4].Xs()[i % 4], positions_[i / 4].Ys()[i % 4] };
-    }
+Vec2f PlanetSystem4::GetPosition(int index) const
+{
+    return { positions_[index / 4].Xs()[index % 4], positions_[index / 4].Ys()[index % 4] };
 }
 
 PlanetSystem8::PlanetSystem8(std::size_t planetCount) noexcept
 {
-    planets_.reserve(planetCount);
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
     std::uniform_real_distribution<float> disRadius(innerRadius, outerRaidus);
     std::uniform_real_distribution<float> disAngle(0, pi);
 
-    std::vector<Vec2f> velocities;
-    velocities.reserve(planetCount);
+    std::vector<Planet> planets;
+    planets.reserve(planetCount);
 
     for (std::size_t i = 0; i < planetCount; i++)
     {
         const auto radius = disRadius(gen);
         const auto angle = disAngle(gen);
 
-        PlanetPos planet;
+        Planet planet;
         
 
         const auto v = Vec2f::up().Rotate(angle) * radius;
 
         planet.position = v + worldCenter;
-        Vec2f velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
-        planets_.push_back(planet);
-        velocities.push_back(velocity);
+        planet.velocity = (planet.position - worldCenter).Perpendicular().Normalized() * std::sqrt(CalculateAcceleration(radius) * radius);
+        planets.push_back(planet);
     }
     positions_.resize(planetCount / 8 + 1);
     velocities_.resize(planetCount / 8 + 1);
@@ -146,26 +147,26 @@ PlanetSystem8::PlanetSystem8(std::size_t planetCount) noexcept
     {
         const std::array<Vec2f, 8> posTmp = {
                 {
-                        i*8<planetCount?planets_[i * 8].position:defaultPos,
-                        i*8+1<planetCount?planets_[i * 8 + 1].position : defaultPos,
-                        i*8+2<planetCount?planets_[i * 8 + 2].position : defaultPos,
-                        i*8+3<planetCount?planets_[i * 8 + 3].position : defaultPos,
-                        i*8+4<planetCount?planets_[i * 8 + 4].position : defaultPos,
-                        i*8+5<planetCount?planets_[i * 8 + 5].position : defaultPos,
-                        i*8+6<planetCount?planets_[i * 8 + 6].position : defaultPos,
-                        i*8+7<planetCount?planets_[i * 8 + 7].position : defaultPos,
+                        i*8<planetCount?planets[i * 8].position:defaultPos,
+                        i*8+1<planetCount?planets[i * 8 + 1].position : defaultPos,
+                        i*8+2<planetCount?planets[i * 8 + 2].position : defaultPos,
+                        i*8+3<planetCount?planets[i * 8 + 3].position : defaultPos,
+                        i*8+4<planetCount?planets[i * 8 + 4].position : defaultPos,
+                        i*8+5<planetCount?planets[i * 8 + 5].position : defaultPos,
+                        i*8+6<planetCount?planets[i * 8 + 6].position : defaultPos,
+                        i*8+7<planetCount?planets[i * 8 + 7].position : defaultPos,
                 } };
         positions_[i] = EightVec2f{ posTmp };
         const std::array<Vec2f, 8> velTmp = {
                 {
-                        i * 8 < planetCount ? velocities[i * 8] : defaultVel,
-                        i * 8 + 1 < planetCount ? velocities[i * 8 + 1] : defaultVel,
-                        i * 8 + 2 < planetCount ? velocities[i * 8 + 2] : defaultVel,
-                        i * 8 + 3 < planetCount ? velocities[i * 8 + 3] : defaultVel,
-                        i * 8 + 4 < planetCount ? velocities[i * 8 + 4] : defaultVel,
-                        i * 8 + 5 < planetCount ? velocities[i * 8 + 5] : defaultVel,
-                        i * 8 + 6 < planetCount ? velocities[i * 8 + 6] : defaultVel,
-                        i * 8 + 7 < planetCount ? velocities[i * 8 + 7] : defaultVel,
+                        i * 8 < planetCount ? planets[i * 8].velocity : defaultVel,
+                        i * 8 + 1 < planetCount ? planets[i * 8 + 1].velocity : defaultVel,
+                        i * 8 + 2 < planetCount ? planets[i * 8 + 2].velocity : defaultVel,
+                        i * 8 + 3 < planetCount ? planets[i * 8 + 3].velocity : defaultVel,
+                        i * 8 + 4 < planetCount ? planets[i * 8 + 4].velocity : defaultVel,
+                        i * 8 + 5 < planetCount ? planets[i * 8 + 5].velocity : defaultVel,
+                        i * 8 + 6 < planetCount ? planets[i * 8 + 6].velocity : defaultVel,
+                        i * 8 + 7 < planetCount ? planets[i * 8 + 7].velocity : defaultVel,
                 } };
         velocities_[i] = EightVec2f{ velTmp };
     }
@@ -185,10 +186,10 @@ void PlanetSystem8::Update(float dt) noexcept
         //Calculate new position
         positions_ [i] += velocities_[i] * eightDt;
     }
+}
 
-    for(std::size_t i = 0; i < planets_.size(); i++)
-    {
-        planets_[i].position = { positions_[i / 8].Xs()[i % 8], positions_[i / 8].Ys()[i % 8] };
-    }
+Vec2f PlanetSystem8::GetPosition(int index) const
+{
+    return { positions_[index / 8].Xs()[index % 8], positions_[index / 8].Ys()[index % 8] };
 }
 }

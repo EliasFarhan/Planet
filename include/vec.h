@@ -399,7 +399,7 @@ inline FourFloat FourFloat::operator*(float rhs) const noexcept
 }
 
 template<>
-inline FourVec2f FourVec2f::operator+(const FourVec2f& v) const noexcept
+inline NVec2f<4> FourVec2f::operator+(const FourVec2f& v) const noexcept
 {
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());

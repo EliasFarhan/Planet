@@ -48,23 +48,20 @@ public:
     PlanetSystem(std::size_t planetCount) noexcept;
     void Update(float dt) noexcept;
     std::span<Planet> GetPlanets() noexcept { return planets_;}
+    Vec2f GetPosition(int index) const;
+
 private:
     std::vector<Planet> planets_;
 };
 
-struct PlanetPos
-{
-    Vec2f position{};
-};
 
 class PlanetSystem4
 {
 public:
     PlanetSystem4(std::size_t planetCount) noexcept;
     void Update(float dt) noexcept;
-    std::span<PlanetPos> GetPlanets() noexcept { return planets_;}
+    Vec2f GetPosition(int index) const;
 private:
-    std::vector<PlanetPos> planets_;
     std::vector<FourVec2f> positions_;
     std::vector<FourVec2f> velocities_;
 };
@@ -74,9 +71,8 @@ class PlanetSystem8
 public:
     PlanetSystem8(std::size_t planetCount) noexcept;
     void Update(float dt) noexcept;
-    std::span<PlanetPos> GetPlanets()  noexcept { return planets_;}
+    Vec2f GetPosition(int index) const;
 private:
-    std::vector<PlanetPos> planets_;
     std::vector<EightVec2f> positions_;
     std::vector<EightVec2f> velocities_;
 };
