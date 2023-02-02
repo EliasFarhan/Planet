@@ -53,11 +53,10 @@ int main()
         }
 
         planetSystem.Update(dt.asSeconds());
-        auto planets = planetSystem.GetPlanets();
         for(int i = 0; i < planetCount; i++)
         {
             const auto position = planetSystem.GetPosition(i);
-            circles[i].setPosition(static_cast<sf::Vector2f>(planets[i].position*planets::pixelToMeter));
+            circles[i].setPosition(static_cast<sf::Vector2f>(position*planets::pixelToMeter));
         }
 
         window.clear();

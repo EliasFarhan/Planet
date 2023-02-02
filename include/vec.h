@@ -8,6 +8,7 @@
 #include <random>
 
 #define USE_INTRINSICS
+#define INTRINSICS_CPP
 
 namespace planets
 {
@@ -333,8 +334,7 @@ using EightVec2f = NVec2f<8>;
 
 #ifdef USE_INTRINSICS
 
-#ifdef USE_INTRINSICS
-
+#if !defined(INTRINSICS_CPP)
 
 #if defined(__SSE__)
 
@@ -672,6 +672,87 @@ inline EightFloat EightVec2f::Dot(const EightVec2f& v1, const EightVec2f& v2) no
 }
 #endif
 
+#else
+
+#if defined(__SSE__)
+
+template<>
+FourFloat::FloatArray(float f) noexcept;
+
+template<>
+FourFloat::FloatArray(const float* f) noexcept;
+
+template<>
+FourFloat FourFloat::Sqrt() const noexcept;
+
+template<>
+FourFloat FourFloat::ReciprocalSqrt() const noexcept;
+
+template<>
+FourFloat FourFloat::operator*(const FourFloat& rhs) const noexcept;
+
+template<>
+FourFloat FourFloat::operator*(float rhs) const noexcept;
+
+template<>
+NVec2f<4> FourVec2f::operator+(const FourVec2f& v) const noexcept;
+
+template<>
+FourVec2f& FourVec2f::operator+=(const FourVec2f& v) noexcept;
+
+template<>
+FourVec2f FourVec2f::operator-(const FourVec2f& v) const noexcept;
+
+template<>
+FourVec2f FourVec2f::operator*(const FourFloat& ns) const noexcept;
+
+template<>
+FourVec2f FourVec2f::operator/(const FourFloat& ns) const noexcept;
+
+template<>
+FourFloat FourVec2f::Dot(const FourVec2f& v1, const FourVec2f& v2) noexcept;
+#endif
+
+
+#ifdef __AVX2__
+
+template<>
+EightFloat::FloatArray(float f) noexcept;
+
+template<>
+EightFloat::FloatArray(const float* f) noexcept;
+
+template<>
+EightFloat EightFloat::Sqrt() const noexcept;
+
+template<>
+EightFloat EightFloat::ReciprocalSqrt() const noexcept;
+
+template<>
+EightFloat EightFloat::operator*(const EightFloat& rhs) const noexcept;
+
+template<>
+EightFloat EightFloat::operator*(float rhs) const noexcept;
+
+//EightVec2f
+template<>
+EightVec2f EightVec2f::operator+(const EightVec2f& other) const noexcept;
+
+template<>
+EightVec2f& EightVec2f::operator+=(const EightVec2f& other) noexcept;
+
+template<>
+EightVec2f EightVec2f::operator-(const EightVec2f& other) const noexcept;
+
+template<>
+EightVec2f EightVec2f::operator*(const EightFloat& ns) const noexcept;
+
+template<>
+EightVec2f EightVec2f::operator/(const EightFloat& ns) const noexcept;
+
+template<>
+EightFloat EightVec2f::Dot(const EightVec2f& v1, const EightVec2f& v2) noexcept;
+#endif
 #endif
 
 #endif

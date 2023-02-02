@@ -47,7 +47,6 @@ class PlanetSystem
 public:
     PlanetSystem(std::size_t planetCount) noexcept;
     void Update(float dt) noexcept;
-    std::span<Planet> GetPlanets() noexcept { return planets_;}
     Vec2f GetPosition(int index) const;
 
 private:

@@ -6,7 +6,7 @@
 
 namespace planets
 {
-#if false
+#ifdef INTRINSICS_CPP
 
 
 #if defined(__SSE__)
@@ -48,7 +48,7 @@ FourFloat FourFloat::ReciprocalSqrt() const noexcept
 }
 
 template<>
-FourFloat FourFloat::operator*(const FloatArray<4>& rhs) const noexcept
+FourFloat FourFloat::operator*(const FourFloat& rhs) const noexcept
 {
     auto v1s = _mm_loadu_ps(data());
     auto v2s = _mm_loadu_ps(rhs.data());
@@ -90,6 +90,23 @@ FourVec2f FourVec2f::operator+(const FourVec2f& v) const noexcept
 }
 
 template<>
+FourVec2f& FourVec2f::operator+=(const FourVec2f& v) noexcept
+{
+    auto x1 = _mm_loadu_ps(xs_.data());
+    auto y1 = _mm_loadu_ps(ys_.data());
+
+    const auto x2 = _mm_loadu_ps(v.xs_.data());
+    const auto y2 = _mm_loadu_ps(v.ys_.data());
+
+    x1 = _mm_add_ps(x1, x2);
+    y1 = _mm_add_ps(y1, y2);
+
+    _mm_storeu_ps(xs_.data(), x1);
+    _mm_storeu_ps(ys_.data(), y1);
+    return *this;
+}
+
+template<>
 FourVec2f FourVec2f::operator-(const FourVec2f& v) const noexcept
 {
     FourVec2f fv3f;
@@ -124,7 +141,7 @@ FourVec2f FourVec2f::operator*(const FourFloat& ns) const noexcept
 }
 
 template<>
-FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const noexcept
+FourVec2f FourVec2f::operator/(const FourFloat& ns) const noexcept
 {
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());
@@ -140,7 +157,7 @@ FourVec2f FourVec2f::operator/(const FloatArray<4>& ns) const noexcept
 }
 
 template<>
-FourFloat FourVec2f::Dot(const NVec2f<4> &v1, const NVec2f<4> &v2) noexcept
+FourFloat FourVec2f::Dot(const FourVec2f&v1, const FourVec2f&v2) noexcept
 {
     FourFloat result;
     auto x1 = _mm_loadu_ps(v1.Xs().data());
@@ -239,6 +256,23 @@ EightVec2f EightVec2f::operator+(const EightVec2f& other) const noexcept
     _mm256_storeu_ps(fv3f.xs_.data(), x1);
     _mm256_storeu_ps(fv3f.ys_.data(), y1);
     return fv3f;
+}
+
+template<>
+EightVec2f& EightVec2f::operator+=(const EightVec2f& other) noexcept
+{
+    auto x1 = _mm256_loadu_ps(xs_.data());
+    auto y1 = _mm256_loadu_ps(ys_.data());
+
+    const auto x2 = _mm256_loadu_ps(other.xs_.data());
+    const auto y2 = _mm256_loadu_ps(other.ys_.data());
+
+    x1 = _mm256_add_ps(x1, x2);
+    y1 = _mm256_add_ps(y1, y2);
+
+    _mm256_storeu_ps(xs_.data(), x1);
+    _mm256_storeu_ps(ys_.data(), y1);
+    return *this;
 }
 
 template<>
