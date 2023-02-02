@@ -254,7 +254,16 @@ public:
         }
         return *this;
     }
-
+    NVec2f<N> operator-() const noexcept
+    {
+        NVec2f<N> result;
+        for (int i = 0; i < N; i++)
+        {
+            result.xs_[i] = -xs_[i];
+            result.ys_[i] = -ys_[i];
+        }
+        return result;
+    }
     NVec2f<N> operator-(const NVec2f<N>& other) const noexcept
     {
         NVec2f<N> result;
@@ -701,6 +710,9 @@ template<>
 FourVec2f& FourVec2f::operator+=(const FourVec2f& v) noexcept;
 
 template<>
+FourVec2f FourVec2f::operator-() const noexcept;
+
+template<>
 FourVec2f FourVec2f::operator-(const FourVec2f& v) const noexcept;
 
 template<>
@@ -740,6 +752,9 @@ EightVec2f EightVec2f::operator+(const EightVec2f& other) const noexcept;
 
 template<>
 EightVec2f& EightVec2f::operator+=(const EightVec2f& other) noexcept;
+
+template<>
+EightVec2f EightVec2f::operator-() const noexcept;
 
 template<>
 EightVec2f EightVec2f::operator-(const EightVec2f& other) const noexcept;

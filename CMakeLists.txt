@@ -8,7 +8,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if (MSVC)
     # warning level 4 and all warnings as errors
-    add_compile_options(/W4 /w14640 /GL /Oy- /arch:AVX2 /Fa)
+    add_compile_options(/W4 /w14640 /GL /Oy- /arch:AVX2 /Fa /fp:fast)
     add_compile_definitions(_USE_MATH_DEFINES)
     add_link_options(/LTCG)
 else()

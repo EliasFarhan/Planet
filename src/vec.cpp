@@ -107,6 +107,23 @@ FourVec2f& FourVec2f::operator+=(const FourVec2f& v) noexcept
 }
 
 template<>
+FourVec2f FourVec2f::operator-() const noexcept
+{
+    FourVec2f fv3f;
+    auto x1 = _mm_loadu_ps(xs_.data());
+    auto y1 = _mm_loadu_ps(ys_.data());
+    __m128 reg;
+    reg = _mm_xor_ps(reg, reg);
+
+    x1 = _mm_sub_ps(x1, reg);
+    y1 = _mm_sub_ps(y1, reg);
+
+    _mm_storeu_ps(fv3f.xs_.data(), x1);
+    _mm_storeu_ps(fv3f.ys_.data(), y1);
+    return fv3f;
+}
+
+template<>
 FourVec2f FourVec2f::operator-(const FourVec2f& v) const noexcept
 {
     FourVec2f fv3f;
@@ -273,6 +290,23 @@ EightVec2f& EightVec2f::operator+=(const EightVec2f& other) noexcept
     _mm256_storeu_ps(xs_.data(), x1);
     _mm256_storeu_ps(ys_.data(), y1);
     return *this;
+}
+
+template<>
+EightVec2f EightVec2f::operator-() const noexcept
+{
+    EightVec2f fv3f;
+    auto x1 = _mm256_loadu_ps(xs_.data());
+    auto y1 = _mm256_loadu_ps(ys_.data());
+    __m256 reg;
+    reg = _mm256_xor_ps(reg, reg);
+
+    x1 = _mm256_sub_ps(reg, x1);
+    y1 = _mm256_sub_ps(reg, y1);
+
+    _mm256_storeu_ps(fv3f.xs_.data(), x1);
+    _mm256_storeu_ps(fv3f.ys_.data(), y1);
+    return fv3f;
 }
 
 template<>
