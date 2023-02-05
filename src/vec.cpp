@@ -112,8 +112,7 @@ FourVec2f FourVec2f::operator-() const noexcept
     FourVec2f fv3f;
     auto x1 = _mm_loadu_ps(xs_.data());
     auto y1 = _mm_loadu_ps(ys_.data());
-    __m128 reg;
-    reg = _mm_xor_ps(reg, reg);
+    __m128 reg = _mm_setzero_ps();
 
     x1 = _mm_sub_ps(x1, reg);
     y1 = _mm_sub_ps(y1, reg);
@@ -298,8 +297,7 @@ EightVec2f EightVec2f::operator-() const noexcept
     EightVec2f fv3f;
     auto x1 = _mm256_loadu_ps(xs_.data());
     auto y1 = _mm256_loadu_ps(ys_.data());
-    __m256 reg;
-    reg = _mm256_xor_ps(reg, reg);
+    __m256 reg = _mm256_setzero_ps();
 
     x1 = _mm256_sub_ps(reg, x1);
     y1 = _mm256_sub_ps(reg, y1);
