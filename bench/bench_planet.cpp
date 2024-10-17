@@ -1,9 +1,9 @@
 #include "planet.h"
 #include <benchmark/benchmark.h>
 
-const long fromRange = 8;
+constexpr long fromRange = 8;
 
-const long toRange = 1 << 15;
+constexpr long toRange = 1 << 15;
 
 static void BM_Update1(benchmark::State& state)
 {

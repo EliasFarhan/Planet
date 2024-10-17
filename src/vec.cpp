@@ -6,7 +6,6 @@
 
 namespace planets
 {
-#if false
 
 
 #if defined(__SSE__)
@@ -72,6 +71,18 @@ FourFloat FourFloat::operator*(float rhs) const noexcept
 }
 
 template<>
+FourFloat FourFloat::operator/(const FloatArray<4>& rhs) const noexcept
+{
+    auto v1s = _mm_loadu_ps(data());
+    auto v2s = _mm_loadu_ps(rhs.data());
+    v1s = _mm_div_ps(v1s, v2s);
+
+    FourFloat result;
+    _mm_storeu_ps(result.data(), v1s);
+    return result;
+}
+
+template<>
 FourVec2f FourVec2f::operator+(const FourVec2f& v) const noexcept
 {
     FourVec2f fv3f;
@@ -88,7 +99,22 @@ FourVec2f FourVec2f::operator+(const FourVec2f& v) const noexcept
     _mm_storeu_ps(fv3f.ys_.data(), y1);
     return fv3f;
 }
+template<>
+FourVec2f& FourVec2f::operator+=(const FourVec2f& v) noexcept
+{
+    auto x1 = _mm_loadu_ps(xs_.data());
+    auto y1 = _mm_loadu_ps(ys_.data());
 
+    const auto x2 = _mm_loadu_ps(v.xs_.data());
+    const auto y2 = _mm_loadu_ps(v.ys_.data());
+
+    x1 = _mm_add_ps(x1, x2);
+    y1 = _mm_add_ps(y1, y2);
+
+    _mm_storeu_ps(xs_.data(), x1);
+    _mm_storeu_ps(ys_.data(), y1);
+    return *this;
+}
 template<>
 FourVec2f FourVec2f::operator-(const FourVec2f& v) const noexcept
 {
@@ -222,6 +248,18 @@ EightFloat EightFloat::operator*(float rhs) const noexcept
     return result;
 }
 
+template<>
+EightFloat EightFloat::operator/(const EightFloat& rhs) const noexcept
+{
+    auto v1s = _mm256_loadu_ps(data());
+    auto v2s = _mm256_loadu_ps(rhs.data());
+    v1s = _mm256_div_ps(v1s, v2s);
+
+    EightFloat result;
+    _mm256_storeu_ps(result.data(), v1s);
+    return result;
+}
+
 //EightVec2f
 template<>
 EightVec2f EightVec2f::operator+(const EightVec2f& other) const noexcept
@@ -239,6 +277,23 @@ EightVec2f EightVec2f::operator+(const EightVec2f& other) const noexcept
     _mm256_storeu_ps(fv3f.xs_.data(), x1);
     _mm256_storeu_ps(fv3f.ys_.data(), y1);
     return fv3f;
+}
+
+template<>
+EightVec2f& EightVec2f::operator+=(const EightVec2f& other) noexcept
+{
+    auto x1 = _mm256_loadu_ps(xs_.data());
+    auto y1 = _mm256_loadu_ps(ys_.data());
+
+    const auto x2 = _mm256_loadu_ps(other.xs_.data());
+    const auto y2 = _mm256_loadu_ps(other.ys_.data());
+
+    x1 = _mm256_add_ps(x1, x2);
+    y1 = _mm256_add_ps(y1, y2);
+
+    _mm256_storeu_ps(xs_.data(), x1);
+    _mm256_storeu_ps(ys_.data(), y1);
+    return *this;
 }
 
 template<>
@@ -311,5 +366,4 @@ EightFloat EightVec2f::Dot(const EightVec2f &v1, const EightVec2f &v2) noexcept
 }
 #endif
 
-#endif
 }

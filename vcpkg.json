@@ -5,6 +5,7 @@
     "sfml",
     "benchmark",
     "gtest",
-    "fmt"
+    "fmt",
+    "tracy"
   ]
 }

@@ -3,6 +3,10 @@
 #include <numbers>
 #include <random>
 
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
+
 namespace planets
 {
 
@@ -34,6 +38,9 @@ PlanetSystem::PlanetSystem(std::size_t planetCount) noexcept
 
 void PlanetSystem::Update(float dt) noexcept
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+#endif
     for (auto& planet : planets_)
     {
         //Calculate new velocity
@@ -98,6 +105,9 @@ PlanetSystem4::PlanetSystem4(std::size_t planetCount) noexcept
 
 void PlanetSystem4::Update(float dt) noexcept
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+#endif
     for (std::size_t i = 0; i < velocities_.size(); i++)
     {
         //Calculate new velocity
@@ -174,6 +184,9 @@ PlanetSystem8::PlanetSystem8(std::size_t planetCount) noexcept
 
 void PlanetSystem8::Update(float dt) noexcept
 {
+#ifdef TRACY_ENABLE
+    ZoneScoped;
+#endif
     for (std::size_t i = 0; i < velocities_.size(); i++)
     {
         //Calculate new velocity

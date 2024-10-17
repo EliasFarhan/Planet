@@ -1,6 +1,8 @@
 //
 // Created by efarhan on 1/27/23.
 //
+#include <numbers>
+
 #include "vec.h"
 #include "planet.h"
 
@@ -12,21 +14,39 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Time.hpp>
 
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
+#endif
+
+
 constexpr unsigned int width = 1280;
 constexpr unsigned int height = 720;
-constexpr auto planetCount = 1024;
+constexpr auto planetCount = 10'000;
 constexpr float zoomFactor = 1.5f;
+constexpr auto circleResolution = 12;
+constexpr auto circleRadius = 3.0f;
+constexpr auto twoPi = 2.0f * std::numbers::pi_v<float>;
 
 int main()
 {
-    planets::PlanetSystem planetSystem(planetCount);
-    std::vector<sf::CircleShape> circles(planetCount);
-    for(auto& circle: circles)
-    {
-        circle.setRadius(3.0f);
-        circle.setFillColor(sf::Color::Blue);
-        circle.setOrigin(3.0f, 3.0f);
-    }
+    planets::PlanetSystem4 planetSystem(planetCount);
+
+	std::vector<planets::Vec2f> circleVertices;
+	circleVertices.reserve(circleResolution);
+	for (int i = 1; i < circleResolution; i++)
+	{
+		circleVertices.emplace_back(std::cos(float(i) * twoPi / circleResolution), std::sin(float(i) * twoPi / circleResolution));
+	}
+
+	sf::VertexArray circles;
+	circles.setPrimitiveType(sf::Triangles);
+	circles.resize(planetCount*(circleResolution*3));
+	for(std::size_t i = 0; i < circles.getVertexCount(); i++)
+	{
+		circles[i].color = sf::Color::Blue;
+	}
+
 
     sf::RenderWindow window(sf::VideoMode(width, height), "Planets");
     //window.setFramerateLimit(5);
@@ -35,6 +55,9 @@ int main()
     while (window.isOpen())
     {
         const auto dt = clock.restart();
+#ifdef TRACY_ENABLE
+        TracyCZoneN(eventHandle, "Event Management", true);
+#endif
         sf::Event event{};
         while (window.pollEvent(event))
         {
@@ -51,21 +74,42 @@ int main()
                 window.setView(view);
             }
         }
-
+#ifdef TRACY_ENABLE
+        TracyCZoneEnd(eventHandle);
+#endif
         planetSystem.Update(dt.asSeconds());
-        auto planets = planetSystem.GetPlanets();
+#ifdef TRACY_ENABLE
+        TracyCZoneN(moveCircles, "Move Circles", true);
+#endif
         for(int i = 0; i < planetCount; i++)
         {
             const auto position = planetSystem.GetPosition(i);
-            circles[i].setPosition(static_cast<sf::Vector2f>(planets[i].position*planets::pixelToMeter));
+        	const auto currentIndex = circleResolution*3*i;
+        	const auto pixelPosition = static_cast<sf::Vector2f>(position*planets::pixelToMeter);
+        	for(int j = 0; j < circleResolution; j++)
+        	{
+        		circles[currentIndex+j*3].position = pixelPosition;
+        		circles[currentIndex+j*3+1].position = pixelPosition+static_cast<sf::Vector2f>(circleVertices[j]*circleRadius);
+        		circles[currentIndex+j*3+2].position = pixelPosition+static_cast<sf::Vector2f>(circleVertices[(j+1)%circleResolution]*circleRadius);
+        	}
         }
+#ifdef TRACY_ENABLE
+    	TracyCZoneEnd(moveCircles);
 
+    	TracyCZoneN(draw, "Draw", true);
+#endif
         window.clear();
-        for(const auto& circle: circles)
-        {
-            window.draw(circle);
-        }
+
+        window.draw(circles);
+
+#ifdef TRACY_ENABLE
+    	TracyCZoneEnd(draw);
+#endif
         window.display();
+
+#ifdef TRACY_ENABLE
+        FrameMark;
+#endif
     }
     return 0;
 }
