@@ -78,6 +78,7 @@ int main()
         TracyCZoneEnd(eventHandle);
 #endif
         planetSystem.Update(dt.asSeconds());
+
 #ifdef TRACY_ENABLE
         TracyCZoneN(moveCircles, "Move Circles", true);
 #endif
@@ -92,6 +93,7 @@ int main()
         		circles[currentIndex+j*3+1].position = pixelPosition+static_cast<sf::Vector2f>(circleVertices[j]*circleRadius);
         		circles[currentIndex+j*3+2].position = pixelPosition+static_cast<sf::Vector2f>(circleVertices[(j+1)%circleResolution]*circleRadius);
         	}
+
         }
 #ifdef TRACY_ENABLE
     	TracyCZoneEnd(moveCircles);

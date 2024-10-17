@@ -44,9 +44,10 @@ void PlanetSystem::Update(float dt) noexcept
     for (auto& planet : planets_)
     {
         //Calculate new velocity
-        const auto radius = (planet.position-worldCenter).Magnitude();
-        const auto accelerationValue = CalculateAcceleration(radius);
-        const auto acceleration = (worldCenter-planet.position).Normalized()*accelerationValue;
+        const auto delta = (planet.position - worldCenter);
+        const auto sqrRadius = delta.SquareMagnitude();
+        const auto accelerationValue = CalculateAcceleration(sqrRadius);
+        const auto acceleration = -delta.Normalized()*accelerationValue;
         planet.velocity += acceleration * dt;
         //Calculate new position
         planet.position += planet.velocity * dt;
@@ -112,8 +113,8 @@ void PlanetSystem4::Update(float dt) noexcept
     {
         //Calculate new velocity
         const auto fourWorldCenter = FourVec2f{ worldCenter };
-        const auto radius = (positions_[i] - fourWorldCenter).Magnitude();
-        const auto accelerationValue = CalculateAcceleration(radius);
+        const auto sqrRadius = (positions_[i] - fourWorldCenter).SquareMagnitude();
+        const auto accelerationValue = CalculateAcceleration(sqrRadius);
         const auto acceleration = (fourWorldCenter - positions_[i]).Normalized() * accelerationValue;
         const auto fourDt = FourFloat{dt};
         velocities_[i] += acceleration * fourDt;
@@ -191,9 +192,10 @@ void PlanetSystem8::Update(float dt) noexcept
     {
         //Calculate new velocity
         const auto eightWorldCenter = EightVec2f {worldCenter };
-        const auto radius = (positions_[i] - eightWorldCenter).Magnitude();
-        const auto accelerationValue = CalculateAcceleration(radius);
-        const auto acceleration = (eightWorldCenter - positions_[i]).Normalized() * accelerationValue;
+        const auto delta = (positions_[i] - eightWorldCenter);
+        const auto sqrRadius = delta.SquareMagnitude();
+        const auto accelerationValue = CalculateAcceleration(sqrRadius);
+        const auto acceleration = (-delta).Normalized() * accelerationValue;
         const auto eightDt = EightFloat{dt};
         velocities_[i] += acceleration * eightDt;
         //Calculate new position

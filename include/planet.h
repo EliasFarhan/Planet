@@ -23,21 +23,21 @@ struct Planet
     Vec2f velocity{};
 };
 
-constexpr float CalculateAcceleration(float radius) noexcept
+constexpr float CalculateAcceleration(float sqrRadius) noexcept
 {
-    return G / (radius * radius);
+    return G / sqrRadius;
 }
 
-inline FourFloat CalculateAcceleration(const FourFloat& radius) noexcept
+inline FourFloat CalculateAcceleration(const FourFloat& sqrRadius) noexcept
 {
     const FourFloat g{ G };
-    return g / (radius * radius);
+    return g / sqrRadius ;
 }
 
-inline EightFloat CalculateAcceleration(const EightFloat& radius) noexcept
+inline EightFloat CalculateAcceleration(const EightFloat& sqrRadius) noexcept
 {
     const EightFloat g{ G };
-    return g / (radius * radius);
+    return g / sqrRadius;
 }
 
 
@@ -47,7 +47,6 @@ class PlanetSystem
 public:
     PlanetSystem(std::size_t planetCount) noexcept;
     void Update(float dt) noexcept;
-    std::span<Planet> GetPlanets() noexcept { return planets_;}
     Vec2f GetPosition(int index) const;
 
 private:

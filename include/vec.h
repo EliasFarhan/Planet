@@ -160,8 +160,10 @@ public:
     NVec2f<N>& operator+=(const NVec2f<N>& other) noexcept;
 
     NVec2f<N> operator-(const NVec2f<N>& other) const noexcept;
+    NVec2f<N> operator-() const noexcept;
     NVec2f<N> operator*(const FloatArray<N>& ns) const noexcept;
     NVec2f<N> operator/(const FloatArray<N>& ns) const noexcept;
+
 
     static FloatArray<N> Dot(const NVec2f<N>& v1, const NVec2f<N>& v2) noexcept;
 
@@ -192,10 +194,6 @@ private:
 
 using FourVec2f = NVec2f<4>;
 using EightVec2f = NVec2f<8>;
-
-#ifdef USE_INTRINSICS
-
-#ifdef USE_INTRINSICS
 
 
 #if defined(__SSE__)
@@ -277,8 +275,6 @@ template<>
 EightFloat EightVec2f::Dot(const EightVec2f& v1, const EightVec2f& v2) noexcept;
 #endif
 
-#endif
 
-#endif
 
 }
