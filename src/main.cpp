@@ -2,16 +2,20 @@
 // Created by efarhan on 1/27/23.
 //
 #include <numbers>
+#include <optional>
+#include <vector>
 
 #include "vec.h"
 #include "planet.h"
+#include "sfml_utils.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/VertexBuffer.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/View.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Time.hpp>
 
 #ifdef TRACY_ENABLE
@@ -32,24 +36,26 @@ int main()
 {
     planets::PlanetSystem4 planetSystem(planetCount);
 
-	std::vector<planets::Vec2f> circleVertices;
-	circleVertices.reserve(circleResolution);
-	for (int i = 1; i < circleResolution; i++)
-	{
-		circleVertices.emplace_back(std::cos(float(i) * twoPi / circleResolution), std::sin(float(i) * twoPi / circleResolution));
-	}
+    std::vector<planets::Vec2f> circleVertices;
+    circleVertices.reserve(circleResolution);
+    for (int i = 0; i < circleResolution; i++)
+    {
+        circleVertices.emplace_back(std::cos(float(i) * twoPi / circleResolution), std::sin(float(i) * twoPi / circleResolution));
+    }
 
-	sf::VertexArray circles;
-	circles.setPrimitiveType(sf::Triangles);
-	circles.resize(planetCount*(circleResolution*3));
-	for(std::size_t i = 0; i < circles.getVertexCount(); i++)
-	{
-		circles[i].color = sf::Color::Blue;
-	}
+    std::vector<sf::Vertex> circles(planetCount*(circleResolution*3));
+    for(auto& vertex : circles)
+    {
+        vertex.color = sf::Color::Blue;
+    }
 
-
-    sf::RenderWindow window(sf::VideoMode(width, height), "Planets");
+    sf::RenderWindow window(sf::VideoMode({width, height}), "Planets");
     //window.setFramerateLimit(5);
+
+    // The vertex buffer needs the window's OpenGL context, so it is created after the window
+    sf::VertexBuffer circleBuffer(sf::PrimitiveType::Triangles, sf::VertexBuffer::Usage::Stream);
+    const bool useVertexBuffer = sf::VertexBuffer::isAvailable() && circleBuffer.create(circles.size());
+
     sf::Clock clock;
     sf::View view = window.getView();
     while (window.isOpen())
@@ -58,19 +64,20 @@ int main()
 #ifdef TRACY_ENABLE
         TracyCZoneN(eventHandle, "Event Management", true);
 #endif
-        sf::Event event{};
-        while (window.pollEvent(event))
+        while (const std::optional event = window.pollEvent())
         {
-            if (event.type == sf::Event::Closed)
-                window.close();
-            if(event.type == sf::Event::Resized)
+            if (event->is<sf::Event::Closed>())
             {
-                view = sf::View({ 0,0 }, { static_cast<float>(event.size.width), static_cast<float>(event.size.height) });
+                window.close();
+            }
+            else if (const auto* resized = event->getIf<sf::Event::Resized>())
+            {
+                view = sf::View({ 0.0f, 0.0f }, sf::Vector2f(resized->size));
                 window.setView(view);
             }
-            if (event.type == sf::Event::MouseWheelScrolled)
+            else if (const auto* scrolled = event->getIf<sf::Event::MouseWheelScrolled>())
             {
-                view.zoom((1.0f - zoomFactor * event.mouseWheelScroll.delta * dt.asSeconds()));
+                view.zoom((1.0f - zoomFactor * scrolled->delta * dt.asSeconds()));
                 window.setView(view);
             }
         }
@@ -85,27 +92,40 @@ int main()
         for(int i = 0; i < planetCount; i++)
         {
             const auto position = planetSystem.GetPosition(i);
-        	const auto currentIndex = circleResolution*3*i;
-        	const auto pixelPosition = static_cast<sf::Vector2f>(position*planets::pixelToMeter);
-        	for(int j = 0; j < circleResolution; j++)
-        	{
-        		circles[currentIndex+j*3].position = pixelPosition;
-        		circles[currentIndex+j*3+1].position = pixelPosition+static_cast<sf::Vector2f>(circleVertices[j]*circleRadius);
-        		circles[currentIndex+j*3+2].position = pixelPosition+static_cast<sf::Vector2f>(circleVertices[(j+1)%circleResolution]*circleRadius);
-        	}
+            const auto currentIndex = circleResolution*3*i;
+            const auto pixelPosition = planets::ToSf(position*planets::pixelToMeter);
+            for(int j = 0; j < circleResolution; j++)
+            {
+                circles[currentIndex+j*3].position = pixelPosition;
+                circles[currentIndex+j*3+1].position = pixelPosition+planets::ToSf(circleVertices[j]*circleRadius);
+                circles[currentIndex+j*3+2].position = pixelPosition+planets::ToSf(circleVertices[(j+1)%circleResolution]*circleRadius);
+            }
 
         }
 #ifdef TRACY_ENABLE
-    	TracyCZoneEnd(moveCircles);
+        TracyCZoneEnd(moveCircles);
 
-    	TracyCZoneN(draw, "Draw", true);
+        TracyCZoneN(upload, "Upload Circles", true);
+#endif
+        const bool uploaded = useVertexBuffer && circleBuffer.update(circles.data());
+#ifdef TRACY_ENABLE
+        TracyCZoneEnd(upload);
+
+        TracyCZoneN(draw, "Draw", true);
 #endif
         window.clear();
 
-        window.draw(circles);
+        if (uploaded)
+        {
+            window.draw(circleBuffer);
+        }
+        else
+        {
+            window.draw(circles.data(), circles.size(), sf::PrimitiveType::Triangles);
+        }
 
 #ifdef TRACY_ENABLE
-    	TracyCZoneEnd(draw);
+        TracyCZoneEnd(draw);
 #endif
         window.display();
 

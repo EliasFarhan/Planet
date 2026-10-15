@@ -11,7 +11,7 @@ namespace planets
 constexpr float innerRadius = 1.5f;
 constexpr float outerRaidus = 5.5f;
 constexpr float pixelToMeter = 100.f;
-constexpr float G = 100.0f;
+constexpr float G = 10.0f;
 constexpr Vec2f worldCenter{ 5.0f, 2.5f };
 //Shoudl not be equal to worldCenter
 constexpr Vec2f defaultPos{ 1.0f, 1.0f };

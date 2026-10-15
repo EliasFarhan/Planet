@@ -1,7 +1,6 @@
 #pragma once
 
 #include "intrinsics.h"
-#include <SFML/System/Vector2.hpp>
 
 #include <cmath>
 #include <array>
@@ -70,6 +69,11 @@ struct Vec2f
         return std::sqrt(SquareMagnitude());
     }
 
+    [[nodiscard]] float ReciprocalMagnitude() const noexcept
+    {
+        return 1.0f/std::sqrt(SquareMagnitude());
+    }
+
     [[nodiscard]] Vec2f Normalized() const noexcept
     {
         return *this/Magnitude();
@@ -80,11 +84,6 @@ struct Vec2f
         const auto dot = Dot(v1, v2);
         const auto det = Det(v1, v2);
         return  std::atan2(det, dot);
-    }
-
-    explicit operator sf::Vector2f() const noexcept
-    {
-        return { x, y };
     }
 };
 
@@ -115,6 +114,7 @@ public:
     FloatArray<N> operator/(float f) const noexcept;
     [[nodiscard]] FloatArray<N> Sqrt() const noexcept;
     [[nodiscard]] FloatArray<N> ReciprocalSqrt() const noexcept;
+
 private:
     std::array<float, N> ns_{};
 };
@@ -146,7 +146,7 @@ public:
         }
     }
 
-    constexpr explicit NVec2f(const std::array<Vec2f, N> array) noexcept
+    constexpr explicit NVec2f(const std::array<Vec2f, N>& array) noexcept
     {
         for (int i = 0; i < N; i++)
         {
@@ -177,6 +177,11 @@ public:
     [[nodiscard]] FloatArray<N> Magnitude() const noexcept
     {
         return SquareMagnitude().Sqrt();
+    }
+
+    [[nodiscard]] FloatArray<N> ReciprocalMagnitude() const noexcept
+    {
+        return SquareMagnitude().ReciprocalSqrt();
     }
 
     [[nodiscard]] NVec2f<N> Normalized() const noexcept
